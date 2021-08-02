@@ -1,8 +1,8 @@
 # 外部接口
 api:
-  tushare_token: 2d33a77015f574476687f4f1aa218d1d97902b98745608b90d6c51b6
-  jq_username: 17602140305
-  jq_password: Lq518518
+  tushare_token:
+  jq_username:
+  jq_password: 
 
 # 策略相关参数
 strategy:
