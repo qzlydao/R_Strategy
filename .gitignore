@@ -1,5 +1,11 @@
-# Object file
-*.o
+.idea/
+__pycache__/
 
-# Ada Library Information
-*.ali
+短线R策略.pptx
+笔试题.docx
+.ipynb_checkpoints/
+data/
+logs/
+trade_data/
+interview data.csv
+短线R策略.ipynb

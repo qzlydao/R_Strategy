@@ -1,0 +1,20 @@
+# 外部接口
+api:
+  tushare_token: 2d33a77015f574476687f4f1aa218d1d97902b98745608b90d6c51b6
+  jq_username: 17602140305
+  jq_password: Lq518518
+
+# 策略相关参数
+strategy:
+  rsi_n: 6
+  window_size: 12
+
+# 定时任务
+scheduler:
+  scan_time: '2021-08-01 18:09:00'
+  select_time: '2021-08-01 18:04:30'
+  watch_times:
+    - '2021-07-29 10:28:00'
+    - '2021-07-29 10:30:00'
+  adjust_times:
+    - '2021-07-29 10:30:00'
