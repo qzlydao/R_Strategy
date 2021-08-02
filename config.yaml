@@ -2,12 +2,13 @@
 api:
   tushare_token:
   jq_username:
-  jq_password: 
+  jq_password:
 
 # 策略相关参数
 strategy:
   rsi_n: 6
   window_size: 12
+
 
 # 定时任务
 scheduler:
