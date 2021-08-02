@@ -11,10 +11,19 @@ strategy:
 
 # 定时任务
 scheduler:
-  scan_time: '2021-08-01 18:09:00'
-  select_time: '2021-08-01 18:04:30'
+  # 扫描所有股票
+  scan_time: '00 09 * * MON-FRI'
+  # 选股池
+  select_time: '05 09 * * MON-FRI'
+  # 观察池
   watch_times:
-    - '2021-07-29 10:28:00'
-    - '2021-07-29 10:30:00'
+    - '28 10 * * MON-FRI'
+    - '28 11 * * MON-FRI'
+    - '58 13 * * MON-FRI'
+    - '58 14 * * MON-FRI'
+  # 校准
   adjust_times:
-    - '2021-07-29 10:30:00'
+    - '30 10 * * MON-FRI'
+    - '30 11 * * MON-FRI'
+    - '00 14 * * MON-FRI'
+    - '00 15 * * MON-FRI'

@@ -7,11 +7,12 @@ import numpy as np
 import pandas as pd
 from apscheduler.events import EVENT_JOB_EXECUTED, EVENT_JOB_ERROR
 from apscheduler.schedulers.background import BlockingScheduler
-from apscheduler.triggers.date import DateTrigger
+from apscheduler.triggers.cron import CronTrigger
 
 from data_utils import query_stock_daily_info, get_suspend_info, get_stock_basic, \
     stock_rsi_calculation, query_stock_hourly_info, indicator_deviate, stock_rsi_calculation2
-from utils import multi_index_pd_concat, get_logger, transfer_code, multi_index_pd_concat2, get_strfdate
+from utils import multi_index_pd_concat, get_logger, transfer_code, multi_index_pd_concat2, get_strfdate, \
+    transfor_crontab_time
 
 ALL_STOCK_PATH = './data/stock_all_pool_{}.csv'
 SELECT_STOCK_PATH = './data/stock_select_pool_{}.csv'
@@ -47,30 +48,30 @@ class RStrategy:
     def __call__(self, *args, **kwargs):
         scheduler = BlockingScheduler()
         # 每天早上扫一遍股票池
-        # trigger1 = CronTrigger.from_crontab(self.scan_time)  # 周一至周五的上午9:00触发
+        trigger1 = CronTrigger.from_crontab(self.scan_time)  # 周一至周五的上午9:00触发
         # todo 删除下一行
-        trigger1 = DateTrigger(self.scan_time)
+        # trigger1 = DateTrigger(self.scan_time)
         scheduler.add_job(self.scan_all_stocks, trigger=trigger1, id='scan_all_stock', args=[True])
 
         # 确定选股池
-        # trigger2 = CronTrigger.from_crontab(self.select_time)
+        trigger2 = CronTrigger.from_crontab(self.select_time)
         # todo 删除下一行
-        trigger2 = DateTrigger(self.select_time)
+        # trigger2 = DateTrigger(self.select_time)
         scheduler.add_job(self.stock_select_pool, trigger=trigger2, id='stock_select_pool', jitter=120)
 
         # 触发观察池
         for idx, watch_time in enumerate(self.watch_times):
-            trigger = DateTrigger(watch_time)
+            # trigger = DateTrigger(watch_time)
 
-            # trigger = CronTrigger.from_crontab(watch_time)
+            trigger = CronTrigger.from_crontab(watch_time)
             scheduler.add_job(self.stock_watch_pool, trigger=trigger, id='stock_watch_pool' + str(idx),
                               args=[watch_time, self.N])
 
         # 整点时刻
         for idx, adjust_time in enumerate(self.adjust_times):
-            # trigger = CronTrigger.from_crontab(adjust_time)
+            trigger = CronTrigger.from_crontab(adjust_time)
             # todo 删除
-            trigger = DateTrigger(adjust_time)
+            # trigger = DateTrigger(adjust_time)
             # 修正数据
             scheduler.add_job(self.stock_watch_adjust, trigger, id='stock_watch_adjust' + str(idx), args=[adjust_time])
             # 指标背离时买入股票
@@ -159,10 +160,10 @@ class RStrategy:
         code_li = transfer_code(code_li)
 
         # Tushare对分钟数据(含60m)的调用有限制，所以调用JoinQuant的API
-        # watch_time, hour_time = transfor_crontab_time(watch_time)
+        watch_time, hour_time = transfor_crontab_time(watch_time)
 
         # todo 删除下行
-        watch_time, hour_time = watch_time
+        # watch_time, hour_time = watch_time
 
         # 初始化标志
         if os.path.exists(WATCH_STOCK_PATH):
@@ -365,32 +366,6 @@ def R_Test():
     # 卖出股票
     # stock_buy_pool
     # 收益分析
-
-
-def buy_strock_test(trade_time):
-    strategy = RStrategy(N=6, window_size=12, scan_time='22', select_time='df', watch_times=['fda'],
-                         adjust_times=['fa'])
-    watch_stock_df = pd.read_csv('data/stock_watch_pool.csv', index_col=['code', 'idx'])
-    strategy.watch_stock_df = watch_stock_df
-    strategy.stock_buy_pool(trade_time)
-
-
-def rsi_calculate_test():
-    df = pd.read_csv('./data/stock_watch_pool_tmp.csv', index_col=['code', 'idx'])
-    stock_rsi_calculation()
-
-
-def r_scheduler_test():
-    # scan_time = "35 01 * * MON-FRI"
-    # select_time = "36 01 * * MON-FRI"
-    # watch_times = ["18 09 * * MON-FRI", "28 11 * * MON-FRI", "58 13 * * MON-FRI", "58 14 * * MON-FRI"]
-    # adjust_times = ["19 09 * * MON-FRI", "30 11 * * MON-FRI", "00 14 * * MON-FRI", "00 15 * * MON-FRI"]
-    scan_time = '2021-08-01 16:02:00'
-    select_time = '2021-08-01 16:02:30'
-    watch_times = [("2021-08-01 01:16:55", "2021-07-30 09:16:55")]
-    adjust_times = ["2021-07-30 09:16:55"]
-    strategy = RStrategy(N=6, window_size=12, scan_time=scan_time, select_time=select_time, watch_times=watch_times,
-                         adjust_times=adjust_times)
 
 
 if __name__ == '__main__':
